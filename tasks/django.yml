@@ -1,0 +1,31 @@
+---
+- name: "django | Install packages"
+  yum:
+    name: [ "python-virtualenv", "python2-django" ]
+    state: present
+
+# https://github.com/gothinkster/django-realworld-example-app.git
+
+# - hosts: all
+#  vars:
+#    django_app_path: ~/src
+#    django_virtualenv: ~/env
+#    django_settings_templates:
+#      - src: local_settings.py.j2
+#        dest: ~/src/myproj/local_settings.py
+#    django_settings: myproj.settings
+#    django_pre_commands:
+#      - command: test
+#        failfast: yes
+#      - validate
+#    django_post_commands:
+#      - command: loaddata
+#        fixtures: defaults.json
+#    django_notify_on_updated: django project updated
+#  roles:
+#    - role: cchurch.django
+#  handlers:
+#    - name: django project updated
+#      debug:
+#        msg: 'Django project in {{django_app_path}} was updated!'
+#

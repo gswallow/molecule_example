@@ -1,5 +1,5 @@
 ---
-- name: "Install epel-release"
+- name: "epel | Install epel-release"
   yum:
     name: epel-release
     state: present

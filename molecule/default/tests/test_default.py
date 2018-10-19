@@ -19,7 +19,12 @@ def test_hosts_file(host):
 
 
 # Yes, it's parametrize
-@pytest.mark.parametrize('name', ['epel-release', 'nginx'])
+@pytest.mark.parametrize('name', [
+    'epel-release',
+    'nginx',
+    'python-virtualenv',
+    'python2-django'
+    ])
 def test_package(host, name):
     p = host.package(name)
 
