@@ -1,0 +1,3 @@
+---
+- include: epel.yml
+- include: nginx.yml
