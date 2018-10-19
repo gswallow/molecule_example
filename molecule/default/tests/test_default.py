@@ -23,9 +23,26 @@ def test_hosts_file(host):
     'epel-release',
     'nginx',
     'python-virtualenv',
-    'python2-django'
+    'python2-django',
+    'git'
     ])
 def test_package(host, name):
     p = host.package(name)
 
     assert p.is_installed
+
+@pytest.mark.parametrize('directory', [
+    '/app',
+    '/env',
+    '/src'
+    ])
+def test_paths(host, directory):
+    d = host.file(directory)
+
+    assert d.is_directory
+
+
+def test_project(host):
+    f = host.file('/src/django-realworld-example-app/.git/config')
+
+    assert f.is_file

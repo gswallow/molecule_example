@@ -2,3 +2,4 @@
 - include: epel.yml
 - include: nginx.yml
 - include: django.yml
+- include: app.yml
