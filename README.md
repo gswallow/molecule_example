@@ -16,8 +16,8 @@ using Vagrant.
 ### Why homebrew?
 
 Homebrew is going to set up Python 3 so that, as a non-privileged user, 
-you can install Python modules with pip in /usr/local/lib/python3.x. Binary 
-symlinks get created in /usr/local/bin. So far, it’s working ok without 
+you can install Python modules with pip in `/usr/local/lib/python3.x`. Binary 
+symlinks get created in `/usr/local/bin`. So far, it’s working ok without 
 having to use virtualenv on my mac.
 
 Installing on a Mac with homebrew and pip:
@@ -110,6 +110,16 @@ to fix errors in response to failing tests:
 
 You can get the current status of your test subject with `molecule list`.
 
+#### molecule test flags
+
+Note that `molecule test`, above, will destroy your test subject, even if a test fails.
+Use the `--destroy never` flag to supress this behavior.
+
+Also note that `molecule test` runs idempotence checks.  You can rely on idempotence
+checks to test your own role, but others' roles that you depend on may not be idempotent
+(or probably aren't!).  You can disable individual test suites in the 
+`molecule/default/molecule.yml` file once your own role passes the idempotence test.
+
 ### Creating a role:
 
         cd ~/src
@@ -118,17 +128,17 @@ You can get the current status of your test subject with `molecule list`.
 
 Running `molecule init` creates a new folder with scaffolding to run other 
 molecule commands. The driver can be any of the examples, above. By default, 
-the driver is “docker.” Inside the “my-role” file, you’ll find the molecule/
-default directory, with a molecule.yml file. The “default” directory reflects 
+the driver is “docker.” Inside the “my-role” file, you’ll find the 
+`molecule/default` directory, with a molecule.yml file. The “default” directory reflects 
 the “default” scenario (there can be more than one scenario). The molecule.yml 
 file defines settings that control Docker, Ansible, Ansible Galaxy, and 
-Testinfra. By default, a simple test will check that the /etc/hosts file exists 
+Testinfra. By default, a simple test will check that the `/etc/hosts` file exists 
 in a Docker container. If you run `molecule test` in side the example role 
 directory, it should pass. Let’s make it not pass.
 
 ### Writing tests
 
-Tests are written with Testinfra. They’re placed in the molecule/default/tests directory. 
+Tests are written with Testinfra. They’re placed in the `molecule/default/tests` directory. 
 Function names must start with ‘test_’. Let’s test that nginx is installed by our Ansible role:
 
         # This suppresses about 80% of the deprecation warnings from python 3.7.
@@ -175,7 +185,7 @@ up with Python 3.7 cluttering output with deprecation warnings. Let’s run our 
             tests/test_default.py:23: AssertionError
 
 Our test fails because nginx is not installed. Let’s install nginx. Edit the 
-tasks/main.yml file and add a task to install nginx:
+`tasks/main.yml` file and add a task to install nginx:
 
         - name: "Install nginx package"
         yum:
@@ -202,7 +212,7 @@ Run `molecule syntax`. It fails. Fix the task by indenting “yum” by two spac
         
             assert p.is_installed
 
-Add EPEL to the tasks/main file:
+Add EPEL to the `tasks/main.yml` file:
 
         ---
         - name: "Enable EPEL and install nginx""
@@ -222,7 +232,7 @@ We’ll fast forward a bit here, installing django, virtulaenv, git and standing
 up an example Django app. The important thing here is that we’re going to use 
 Galaxy. Ansible Galaxy is a collection of reusable roles maintained by the Ansible 
 community. Let’s import a role to manage a Django app. Modify the 
-molecule/default/molecule.yml file, then create a requirements.yml file:
+`molecule/default/molecule.yml` file, then create a `requirements.yml` file:
 
         ---
         # molecule.yml
