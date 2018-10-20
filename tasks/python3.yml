@@ -1,0 +1,11 @@
+---
+- name: "python3 | Install packages"
+  yum:
+    name: [ "python-setuptools", "python36u", "python36u-devel", "python36u-setuptools", "python36u-pip" ]
+    state: present
+
+- name: "python3 | Install virtualenv"
+  pip:
+    name: virtualenv
+    state: present
+    executable: pip3.6

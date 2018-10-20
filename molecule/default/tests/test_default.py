@@ -21,20 +21,39 @@ def test_hosts_file(host):
 # Yes, it's parametrize
 @pytest.mark.parametrize('name', [
     'epel-release',
+    'ius-release',
     'nginx',
-    'python-virtualenv',
-    'python2-django',
-    'git'
+    'python-setuptools',
+    'python36u',
+    'python36u-devel',
+    'python36u-pip',
+    'python36u-setuptools',
+    'git',
+    'sqlite'
     ])
 def test_package(host, name):
     p = host.package(name)
 
     assert p.is_installed
 
+@pytest.mark.parametrize('package', [
+    'pip',
+    'setuptools',
+    'virtualenv',
+    ])
+def test_pip(host, package):
+    p = host.pip_package.get_packages(pip_path='pip3.6')
+    assert package in p
+
+
+def test_django(host):
+    p = host.pip_package.get_packages(pip_path='/venv/bin/pip')
+    assert 'Django' in p
+
+
 @pytest.mark.parametrize('directory', [
     '/app',
-    '/env',
-    '/src'
+    '/venv'
     ])
 def test_paths(host, directory):
     d = host.file(directory)
@@ -43,6 +62,11 @@ def test_paths(host, directory):
 
 
 def test_project(host):
-    f = host.file('/src/django-realworld-example-app/.git/config')
+    f = host.file('/app/django-blog/.git/config')
 
     assert f.is_file
+
+
+def test_manage_py_perms(host):
+    f = host.file('/app/django-blog/manage.py')
+    assert oct(f.mode) == '0o755'

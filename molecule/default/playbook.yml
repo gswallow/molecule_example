@@ -1,5 +1,15 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    django_app_path: /app/django-blog
+    django_virtualenv: /venv
+    django_main_commands:
+      - command: migrate
+      - command: loaddata
+        fixtures: users posts comments
+    django_user: root
+
   roles:
     - role: molecule-example
+    - role: cchurch.django

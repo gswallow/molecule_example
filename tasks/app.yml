@@ -1,46 +1,33 @@
 ---
-- name: "app | Install git"
+- name: "app | Install prerequisites"
   yum:
-    name: git
+    name: [ "git", "sqlite" ]
     state: present
 
 - name: "app | Create directories"
   file:
     state: directory
     name: "{{ item }}"
+    recurse: True
   with_items:
     - /app
-    - /env
-    - /src
+    - /venv
 
 - name: "app | Clone example app"
   git:
-    repo: "https://github.com/gothinkster/django-realworld-example-app.git"
-    dest: /src/django-realworld-example-app
+    repo: "https://github.com/reljicd/django-blog.git"
+    dest: /app/django-blog
+    force: True
 
+- name: "app | install pip modules from requirements"
+  pip:
+    requirements: /app/django-blog/requirements.txt
+    virtualenv: /venv
+    virtualenv_python: python3.6
 
-# https://github.com/gothinkster/django-realworld-example-app.git
-
-# - hosts: all
-#  vars:
-#    django_app_path: ~/src
-#    django_virtualenv: ~/env
-#    django_settings_templates:
-#      - src: local_settings.py.j2
-#        dest: ~/src/myproj/local_settings.py
-#    django_settings: myproj.settings
-#    django_pre_commands:
-#      - command: test
-#        failfast: yes
-#      - validate
-#    django_post_commands:
-#      - command: loaddata
-#        fixtures: defaults.json
-#    django_notify_on_updated: django project updated
-#  roles:
-#    - role: cchurch.django
-#  handlers:
-#    - name: django project updated
-#      debug:
-#        msg: 'Django project in {{django_app_path}} was updated!'
-#
+- name: "app | Make manage.py executable"
+  file:
+    name: /app/django-blog/manage.py
+    mode: 0755
+    owner: root
+    group: root

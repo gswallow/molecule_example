@@ -3,3 +3,9 @@
   yum:
     name: epel-release
     state: present
+
+- name: "epel | Install IUS-release"
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+    state: present
+
