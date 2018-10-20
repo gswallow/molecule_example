@@ -30,7 +30,8 @@ def test_hosts_file(host):
     'python36u-setuptools',
     'git',
     'sqlite',
-    'uwsgi'
+    'uwsgi',
+    'which'
     ])
 def test_package(host, name):
     p = host.package(name)
@@ -54,7 +55,8 @@ def test_django(host):
 
 @pytest.mark.parametrize('directory', [
     '/app',
-    '/venv'
+    '/venv',
+    '/run/uwsgi'
     ])
 def test_paths(host, directory):
     d = host.file(directory)
@@ -70,4 +72,12 @@ def test_project(host):
 
 def test_manage_py_perms(host):
     f = host.file('/app/django-blog/manage.py')
+
     assert oct(f.mode) == '0o755'
+
+
+def test_uwsgi(host):
+    s = host.service('uwsgi')
+
+    assert s.is_running
+    assert s.is_enabled

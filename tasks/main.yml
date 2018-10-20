@@ -1,4 +1,9 @@
 ---
+- name: "main | install which"
+  yum:
+    name: which
+    state: present
+
 - include: epel.yml
 - include: nginx.yml
 - include: python3.yml

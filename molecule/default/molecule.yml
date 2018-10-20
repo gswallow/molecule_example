@@ -10,6 +10,16 @@ lint:
 platforms:
   - name: instance
     image: centos/systemd:latest
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    security_opts:
+      - seccomp=unconfined
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /tmp
+      - /run
+    command: /usr/sbin/init
 provisioner:
   name: ansible
   lint:
