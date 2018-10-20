@@ -9,6 +9,7 @@ with warnings.catch_warnings():
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
 
+
 # Yes, it's parametrize
 @pytest.mark.parametrize('name', [
     'epel-release',
