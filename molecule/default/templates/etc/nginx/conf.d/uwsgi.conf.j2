@@ -1,0 +1,17 @@
+upstream django {
+    server 127.0.0.1:8000; # for a web port socket (we'll use this first)
+}
+
+server {
+    listen 81 default;
+    server_name _;
+    charset utf-8;
+
+    # max upload size
+    client_max_body_size 10M;
+
+    location / {
+        uwsgi_pass  django;
+        include     /etc/nginx/uwsgi_params;
+    }
+}

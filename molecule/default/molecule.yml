@@ -19,6 +19,10 @@ platforms:
     tmpfs:
       - /tmp
       - /run
+    exposed_ports:
+      - 81/tcp
+    published_ports:
+      - 0.0.0.0:80:81/tcp
     command: /usr/sbin/init
 provisioner:
   name: ansible

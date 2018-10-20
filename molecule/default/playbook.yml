@@ -28,3 +28,19 @@
     - role: molecule-example
     - role: cchurch.django
     - role: cchurch.uwsgi
+
+  tasks:
+    - name: "Enable uwsgi through nginx"
+      template:
+        src: etc/nginx/conf.d/uwsgi.conf.j2
+        dest: /etc/nginx/conf.d/uwsgi.conf
+        mode: 0755
+        owner: root
+        group: root
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
