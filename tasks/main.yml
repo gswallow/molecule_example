@@ -4,6 +4,11 @@
     name: which
     state: present
 
+- name: "main | install iproute"
+  yum:
+    name: iproute
+    state: present
+
 - name: "main | include repos tasks"
   include_tasks: repos.yml
 

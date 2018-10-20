@@ -17,6 +17,7 @@
   git:
     repo: "https://github.com/reljicd/django-blog.git"
     dest: /app/django-blog
+    update: false
     force: true
 
 - name: "app | install pip modules from requirements"
