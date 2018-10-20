@@ -4,7 +4,7 @@
     name: which
     state: present
 
-- include: epel.yml
+- include: repos.yml
 - include: nginx.yml
 - include: python3.yml
 - include: app.yml

@@ -1,10 +1,10 @@
 ---
-- name: "epel | Install epel-release"
+- name: "repos | Install epel-release"
   yum:
     name: epel-release
     state: present
 
-- name: "epel | Install IUS-release"
+- name: "repos | Install IUS-release"
   yum:
     name: https://centos7.iuscommunity.org/ius-release.rpm
     state: present

@@ -3,3 +3,9 @@
   yum:
     name: nginx
     state: present
+
+- name: "nginx | Enable nginx service"
+  service:
+    name: nginx
+    enabled: true
+    state: started
