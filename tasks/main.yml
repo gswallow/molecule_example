@@ -9,9 +9,9 @@
 
 - name: "main | include nginx tasks"
   include_tasks: nginx.yml
-  
+
 - name: "main | include python3 tasks"
   include_tasks: python3.yml
-  
+
 - name: "main | include app tasks"
   include_tasks: app.yml

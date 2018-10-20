@@ -8,7 +8,7 @@
   file:
     state: directory
     name: "{{ item }}"
-    recurse: True
+    recurse: true
   with_items:
     - /app
     - /venv
@@ -17,7 +17,7 @@
   git:
     repo: "https://github.com/reljicd/django-blog.git"
     dest: /app/django-blog
-    force: True
+    force: true
 
 - name: "app | install pip modules from requirements"
   pip:
