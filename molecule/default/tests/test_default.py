@@ -29,7 +29,8 @@ def test_hosts_file(host):
     'python36u-pip',
     'python36u-setuptools',
     'git',
-    'sqlite'
+    'sqlite',
+    'uwsgi'
     ])
 def test_package(host, name):
     p = host.package(name)

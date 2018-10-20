@@ -1,3 +1,6 @@
 ---
 - name: "cchurch.django"
   version: '0.5.6'
+
+- name: "cchurch.uwsgi"
+  version: '0.4.1'

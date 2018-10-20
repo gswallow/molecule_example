@@ -9,7 +9,21 @@
       - command: loaddata
         fixtures: users posts comments
     django_user: root
+    uwsgi_os_packages:
+      - uwsgi
+      - uwsgi-plugin-python36u
+    uwsgi_vassals:
+      - name: blog
+        plugin: python
+        chdir: /app/django-blog
+        module: manage.py
+        home: /venv
+        processes: 1
+        socket: 127.0.0.1:8000
+        uid: root
+        gid: root
 
   roles:
     - role: molecule-example
     - role: cchurch.django
+    - role: cchurch.uwsgi
