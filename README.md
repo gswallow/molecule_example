@@ -1,4 +1,4 @@
-## Molecule example
+## Test-driven Ansible Role Development with Molecule and Docker
 
 Molecule is a testing framework that can fire up a VM or a Linux container 
 and test an Ansible role through scenarios (a sample playbook). It checks 
@@ -8,7 +8,12 @@ the VM or container, and then tests that Ansible did its job with TestInfra.
 Some components should be installed with Homebrew. The python bits should 
 be installed with Python pip, once Homebrew has it set up.
 
-## Why homebrew?
+### Why docker?
+
+Spinning up a container takes a fraction of the time it takes to spin up a VM 
+using Vagrant.
+
+### Why homebrew?
 
 Homebrew is going to set up Python 3 so that, as a non-privileged user, 
 you can install Python modules with pip in /usr/local/lib/python3.x. Binary 
@@ -33,9 +38,9 @@ Installing on a Mac with homebrew and pip:
         }
         EOF
         
-        source ~/.bash_profile
-        brew doctor 
-        # if anything's wrong, follow brew's instructions to fix it.
+        source ~/.bash_profile # note the dme function, above
+
+        brew doctor # if anything's wrong, follow brew's instructions to fix it.
         
         pip --version
         # pip 18.0 from /usr/local/lib/python3.7/site-packages/pip (python 3.7)
@@ -48,16 +53,35 @@ Installing on a Mac with homebrew and pip:
         EOF
         Running docker-machine on a Mac:
         
-        docker-machine create default # --driver xhyve
-        eval $(docker-machine env default) # I created a function for this in my .bash_profile file named 'dme'.
+        docker-machine create default --driver xhyve
+        dme # or eval $(docker-machine env default)
         
         # test it out:
         docker run --name test -d centos /bin/bash -c 'echo it worked'
         docker logs test
-        Running molecule
 
-Simply running ‘molecule' will generate command help. Some commands are complex, 
-while some commands are simple. ‘molecule matrix’ explains what a complex command does:
+### "Fix" docker-machine
+
+Ansible isn't really meant for containers.  Sure, there are articles out there
+claiming that you can automate containers with Ansible but that whole process
+seems silly, considering how simple containers are.  Consider tools like
+[source2image](https://github.com/openshift/source-to-image) and using CM tools
+on containers makes even *less* sense.
+
+Lots of Ansible roles assume you're running them on a VM, so when systemd isn't
+available, you'll run into trouble.  You'll need to "fix" your docker-machine
+so that the centos-systemd docker image can run:
+
+        docker run -t -i --rm --privileged -v /:/host solita/centos-systemd setup
+        docker rmi solita/centos-systemd
+
+Feel free to check out [this container](https://hub.docker.com/r/solita/centos-systemd/).
+The author deserves kudos, for sure.
+
+### Running molecule
+
+Simply running `molecule` will generate command help. Some commands are complex, 
+while some commands are simple. `molecule matrix` explains what a complex command does:
 
         $ molecule matrix test
         --> Validating schema /Users/gswallow/src/greg/molecule-example/molecule/default/molecule.yml.
@@ -80,29 +104,29 @@ The complex commands understandably take a while to run because they do a lot
 of things. You can control these steps by hand, which speeds up your ability 
 to fix errors in response to failing tests:
 
-- molecule create creates your test subject (container or VM)
-- molecule converge runs Ansible on your test subject
-- molecule verify runs TestInfra on the converged test subject
+- `molecule create` creates your test subject (container or VM)
+- `molecule converge` runs Ansible on your test subject
+- `molecule verify` runs TestInfra on the converged test subject
 
-You can get the current status of your test subject with ‘molecule list.'
+You can get the current status of your test subject with `molecule list`.
 
-Creating a role:
+### Creating a role:
 
         cd ~/src
         eval $(docker-machine env default)
         molecule init -r my-role [-d azure|delegated|docker|ec2|gce|lxc|lxd|openstack|vagrant]
 
-Running molecule init creates a new folder with scaffolding to run other 
+Running `molecule init` creates a new folder with scaffolding to run other 
 molecule commands. The driver can be any of the examples, above. By default, 
 the driver is “docker.” Inside the “my-role” file, you’ll find the molecule/
 default directory, with a molecule.yml file. The “default” directory reflects 
 the “default” scenario (there can be more than one scenario). The molecule.yml 
 file defines settings that control Docker, Ansible, Ansible Galaxy, and 
 Testinfra. By default, a simple test will check that the /etc/hosts file exists 
-in a Docker container. If you run ‘molecule test’ in side the example role 
+in a Docker container. If you run `molecule test` in side the example role 
 directory, it should pass. Let’s make it not pass.
 
-## Writing tests
+### Writing tests
 
 Tests are written with Testinfra. They’re placed in the molecule/default/tests directory. 
 Function names must start with ‘test_’. Let’s test that nginx is installed by our Ansible role:
@@ -157,7 +181,8 @@ tasks/main.yml file and add a task to install nginx:
         yum:
             name: nginx
             state: present
-        Run ‘molecule syntax’. It fails. Fix the task by indenting “yum” by two spaces and run ‘molecule syntax’ again. It should pass. Run ‘molecule converge.'
+
+Run `molecule syntax`. It fails. Fix the task by indenting “yum” by two spaces and run `molecule syntax` again. It should pass. Run `molecule converge`.
         
          TASK [molecule-example : Install nginx package] ********************************
             fatal: [instance]: FAILED! => {"changed": false, "msg": "No package matching 'nginx' found available, installed or updated", "rc": 126, "results": ["No package matching 'nginx' found available, installed or updated"]}
@@ -188,10 +213,10 @@ Add EPEL to the tasks/main file:
             - epel-release
             - nginx
 
-Run ‘molecule syntax’, ‘molecule converge’, and ‘molecule verify’ again. The 
+Run `molecule syntax`, `molecule converge`, and `molecule verify` again. The 
 tests should pass, and instead of running two tests, you’ll have run three.
 
-## Importing roles
+### Importing roles
 
 We’ll fast forward a bit here, installing django, virtulaenv, git and standing 
 up an example Django app. The important thing here is that we’re going to use 
@@ -210,7 +235,10 @@ molecule/default/molecule.yml file, then create a requirements.yml file:
         - name: "cchurch.django"
           version: '0.5.6'
 
-Let’s test that we can satisfy our dependencies by running ‘molecule dependency.' 
+Let’s test that we can satisfy our dependencies by running `molecule dependency`. 
+
+### Using imported roles
+
 Depending on the role is fine but let’s use it. Edit the molecule/default/playbook.yml 
 file to include the role and set some variables that the django role requires. 
 Finally, we’ll include the role in the play:
@@ -226,11 +254,25 @@ Finally, we’ll include the role in the play:
               - command: loaddata 
                 fixtures: users posts comments
             django_user: root
+            uwsgi_os_packages:
+              - uwsgi
+              - uwsgi-plugin-python36u
+            uwsgi_use_systemd: true
+            uwsgi_vassals:
+              - name: blog
+                plugin: python
+                chdir: /app/django-blog
+                module: manage.py
+                home: /venv
+                processes: 1
+                socket: 127.0.0.1:8000
+                uid: root
+                gid: root
         
           roles:
             - role: molecule-example
             - role: cchurch.django
 
-## Credit
+### Credit
 
-This how-to started off heavily influenced by: https://hashbangwallop.com/tdd-ansible.html.
+My how-to is heavily influenced by [this article](https://hashbangwallop.com/tdd-ansible.html).
