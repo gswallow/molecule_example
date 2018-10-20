@@ -4,6 +4,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     import os
     import testinfra.utils.ansible_runner
+    import pytest
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
@@ -17,6 +18,8 @@ def test_hosts_file(host):
     assert f.group == 'root'
 
 
-def test_which(host):
-    p = host.package('which')
+@pytest.mark.parametrize('name', ['which', 'iproute'])
+def test_which(host, name):
+    p = host.package(name)
+
     assert p.is_installed
