@@ -4,7 +4,14 @@
     name: which
     state: present
 
-- include: repos.yml
-- include: nginx.yml
-- include: python3.yml
-- include: app.yml
+- name: "main | include repos tasks"
+  include_tasks: repos.yml
+
+- name: "main | include nginx tasks"
+  include_tasks: nginx.yml
+  
+- name: "main | include python3 tasks"
+  include_tasks: python3.yml
+  
+- name: "main | include app tasks"
+  include_tasks: app.yml
