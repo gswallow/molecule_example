@@ -33,6 +33,11 @@
     owner: root
     group: root
 
+- name: "app | Check that /run/uwsgi exists"
+  stat:
+    path: /run/uwsgi
+  register: _stat_run_uwsgi
+
 - name: "app | Create /run/uwsgi directory"
   file:
     name: /run/uwsgi
@@ -40,3 +45,4 @@
     mode: 0755
     owner: root
     group: root
+  when: _stat_run_uwsgi.stat.exists == False
