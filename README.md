@@ -20,6 +20,27 @@ you can install Python modules with pip in `/usr/local/lib/python3.x`. Binary
 symlinks get created in `/usr/local/bin`. So far, it’s working ok without 
 having to use virtualenv on my mac.
 
+### "Fix" docker-machine
+
+Ansible isn't really meant for containers.  Sure, there are articles out there
+claiming that you can automate containers with Ansible but that whole process
+seems silly, considering how simple containers are.  Consider tools like
+[source2image](https://github.com/openshift/source-to-image) and using CM tools
+on containers makes even *less* sense.
+
+Lots of Ansible roles assume you're running them on a VM, so when things like
+systemd or d-bus aren't avialable, you'll run into trouble.  You'll need to "fix"
+your docker-machine so that the centos-systemd docker image can run:
+
+        docker run -t -i --rm --privileged -v /:/host solita/centos-systemd setup
+        docker rmi solita/centos-systemd
+
+Feel free to check out [this container](https://hub.docker.com/r/solita/centos-systemd/).
+The author deserves kudos, for sure.  If you don't have docker-machine installed,
+read the next section.
+
+### Getting started
+
 Installing on a Mac with homebrew and pip:
 
         brew install python
@@ -60,23 +81,7 @@ Installing on a Mac with homebrew and pip:
         docker run --name test -d centos /bin/bash -c 'echo it worked'
         docker logs test
 
-### "Fix" docker-machine
-
-Ansible isn't really meant for containers.  Sure, there are articles out there
-claiming that you can automate containers with Ansible but that whole process
-seems silly, considering how simple containers are.  Consider tools like
-[source2image](https://github.com/openshift/source-to-image) and using CM tools
-on containers makes even *less* sense.
-
-Lots of Ansible roles assume you're running them on a VM, so when systemd isn't
-available, you'll run into trouble.  You'll need to "fix" your docker-machine
-so that the centos-systemd docker image can run:
-
-        docker run -t -i --rm --privileged -v /:/host solita/centos-systemd setup
-        docker rmi solita/centos-systemd
-
-Feel free to check out [this container](https://hub.docker.com/r/solita/centos-systemd/).
-The author deserves kudos, for sure.
+Remember to fix your running docker-machine VM.  See above.
 
 ### Running molecule
 
@@ -110,20 +115,9 @@ to fix errors in response to failing tests:
 
 You can get the current status of your test subject with `molecule list`.
 
-#### molecule test flags
-
-Note that `molecule test`, above, will destroy your test subject, even if a test fails.
-Use the `--destroy never` flag to supress this behavior.
-
-Also note that `molecule test` runs idempotence checks.  You can rely on idempotence
-checks to test your own role, but others' roles that you depend on may not be idempotent
-(or probably aren't!).  You can disable individual test suites in the 
-`molecule/default/molecule.yml` file once your own role passes the idempotence test.
-
 ### Creating a role:
 
         cd ~/src
-        eval $(docker-machine env default)
         molecule init -r my-role [-d azure|delegated|docker|ec2|gce|lxc|lxd|openstack|vagrant]
 
 Running `molecule init` creates a new folder with scaffolding to run other 
@@ -147,7 +141,6 @@ Function names must start with ‘test_’. Let’s test that nginx is installed
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             import os
             import testinfra.utils.ansible_runner
-            import pytest
         
         testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
             os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
@@ -188,15 +181,17 @@ Our test fails because nginx is not installed. Let’s install nginx. Edit the
 `tasks/main.yml` file and add a task to install nginx:
 
         - name: "Install nginx package"
-        yum:
+          yum:
             name: nginx
             state: present
 
-Run `molecule syntax`. It fails. Fix the task by indenting “yum” by two spaces and run `molecule syntax` again. It should pass. Run `molecule converge`.
+It should pass. Run `molecule converge`.
         
          TASK [molecule-example : Install nginx package] ********************************
             fatal: [instance]: FAILED! => {"changed": false, "msg": "No package matching 'nginx' found available, installed or updated", "rc": 126, "results": ["No package matching 'nginx' found available, installed or updated"]}
-        Whoops. There’s no package named ‘nginx.' Let’s fix that. Edit the molecule/default/tests/test_default.py file and add ‘epel-release’ to the list of packages:
+
+Whoops. There’s no package named ‘nginx.' Let’s fix that. Edit the `molecule/default/tests/test_default.py`
+file and add ‘epel-release’ to the list of packages:
         
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -223,13 +218,13 @@ Add EPEL to the `tasks/main.yml` file:
             - epel-release
             - nginx
 
-Run `molecule syntax`, `molecule converge`, and `molecule verify` again. The 
-tests should pass, and instead of running two tests, you’ll have run three.
+Run `molecule converge`, and `molecule verify` again. The tests should pass, 
+and instead of running two tests, you’ll have run three.
 
 ### Importing roles
 
 We’ll fast forward a bit here, installing django, virtulaenv, git and standing 
-up an example Django app. The important thing here is that we’re going to use 
+up an example Django app. What's important is that we’re going to use 
 Galaxy. Ansible Galaxy is a collection of reusable roles maintained by the Ansible 
 community. Let’s import a role to manage a Django app. Modify the 
 `molecule/default/molecule.yml` file, then create a `requirements.yml` file:
@@ -247,10 +242,16 @@ community. Let’s import a role to manage a Django app. Modify the
 
 Let’s test that we can satisfy our dependencies by running `molecule dependency`. 
 
-### Using imported roles
+### Template and variable scope
 
-Depending on the role is fine but let’s use it. Edit the molecule/default/playbook.yml 
-file to include the role and set some variables that the django role requires. 
+Depending on the role is fine but let’s use it. Edit the `molecule/default/playbook.yml` 
+file to include the role and set some variables that the django role requires. Note that
+we define variables for the `cchurch.django` role in our playbook, but *NOT* in our
+role's `vars` or `defaults` direcrtories. 
+
+When creating templates just for testing, the same rule applies.  Drop templates into
+the `molecule/default/templates` folder, instead of directly into your role.
+
 Finally, we’ll include the role in the play:
 
         ---
@@ -264,25 +265,30 @@ Finally, we’ll include the role in the play:
               - command: loaddata 
                 fixtures: users posts comments
             django_user: root
-            uwsgi_os_packages:
-              - uwsgi
-              - uwsgi-plugin-python36u
-            uwsgi_use_systemd: true
-            uwsgi_vassals:
-              - name: blog
-                plugin: python
-                chdir: /app/django-blog
-                module: manage.py
-                home: /venv
-                processes: 1
-                socket: 127.0.0.1:8000
-                uid: root
-                gid: root
         
           roles:
             - role: molecule-example
             - role: cchurch.django
 
+#### Molecule test flags and test_sequence
+
+Note that `molecule test`, above, will destroy your test subject when a test fails.
+Repeatedly creating docker containers and running Ansible is slow.  Using the `--destroy never`
+flag suppresses this behavior.
+
+Also note that `molecule test` runs idempotence checks.  You can rely on idempotence
+checks to test your own role, but others' roles that you depend on may not be idempotent
+(and probably aren't!).  You can disable individual test suites in the 
+`molecule/default/molecule.yml` file once your own role passes the idempotence test.  Which 
+leads us to...
+
+### Scenarios
+
+Perhaps you want to test the idempotence of your Ansible role by hand, but you don't want 
+your CI server to trip on idempotence checks.  This is a reason to use Molecule scenarios.
+Thankfully, you can DRY up your scenarios by sharing tests and playbooks.  See [this](https://molecule.readthedocs.io/en/latest/examples.html#sharing-across-scenarios)
+page for details on how to set up multiple scenarios.
+
 ### Credit
 
-My how-to is heavily influenced by [this article](https://hashbangwallop.com/tdd-ansible.html).
+Getting started, I was heavily informed by [this article](https://hashbangwallop.com/tdd-ansible.html).  Props.
