@@ -15,14 +15,19 @@
     uwsgi_use_systemd: true
     uwsgi_vassals:
       - name: blog
-        plugin: python
+        plugin: python36u
         chdir: /app/django-blog
-        module: manage.py
         home: /venv
-        processes: 1
-        socket: 127.0.0.1:8000
-        uid: root
-        gid: root
+        module: mysite.wsgi:application
+        env: DJANGO_SETTINGS_MODULE=mysite.settings
+        master: true
+        processes: 5
+        chmod-socket: 666
+        socket: /run/uwsgi/uwsgi.sock
+        uid: uwsgi
+        gid: uwsgi
+        vacuum: true
+        max-requests: 1000
 
   roles:
     - role: molecule-example
@@ -39,8 +44,19 @@
         group: root
       notify: restart nginx
 
+    - name: "Fix allowed host headers"
+      lineinfile:
+        path: /app/django-blog/mysite/settings.py
+        regexp: '^ALLOWED_HOSTS'
+        line: 'ALLOWED_HOSTS = ["*"]'
+      notify: restart uwsgi
+
   handlers:
     - name: restart nginx
       service:
         name: nginx
+        state: restarted
+    - name: restart uwsgi
+      service:
+        name: uwsgi
         state: restarted

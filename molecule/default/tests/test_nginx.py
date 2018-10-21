@@ -19,3 +19,15 @@ def test_service(host):
     s = host.service('nginx')
 
     assert s.is_enabled
+
+
+def test_nginx(host):
+    s = host.service('nginx')
+
+    assert s.is_running
+
+
+def test_port_81(host):
+    s = host.socket("tcp://0.0.0.0:81")
+
+    assert s.is_listening
