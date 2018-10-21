@@ -5,8 +5,7 @@
     name: it_just_works
     state: present
 
-# EXAMPLE_3: introduce syntax error (missing semicolon)
-- name "main | install which"
+- name: "main | install which"
   yum:
     name: which
     state: present
@@ -25,5 +24,7 @@
 - name: "main | include python3 tasks"
   include_tasks: python3.yml
 
+# EXAMPLE_3: introduce syntax error (invalid parameter)
 - name: "main | include app tasks"
   include_tasks: app.yml
+  cant_do_this: true
