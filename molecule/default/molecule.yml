@@ -9,8 +9,9 @@ lint:
   name: yamllint
 platforms:
   - name: instance
-    # EXAMPLE_4: break 'molecule create' by changing 'latest' to 'earliest'
-    image: centos/systemd:earliest
+    # EXAMPLE_4: break 'molecule create' by changing 'latest' to 'best'
+    # because you should always run the best Docker image
+    image: centos/systemd:best
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     security_opts:
@@ -39,7 +40,7 @@ scenario:
     - create
     - prepare
     - converge
-    # EXAMPLE_6: idempotence is hard.  Hint: molecule test --destroy never
+    # EXAMPLE_6: idempotence is hard.  Look at molecule scenarios for CI.
     - idempotence
     - side_effect
     - verify

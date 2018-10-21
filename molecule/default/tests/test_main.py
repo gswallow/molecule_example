@@ -4,7 +4,8 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     import os
     import testinfra.utils.ansible_runner
-# EXAMPLE_1: make the linter fail
+    # EXAMPLE_1: make the linter fail by importing an unused module
+    # Hint: From now on, try running molecule test --destroy never
     import pytest
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
