@@ -20,49 +20,13 @@ Homebrew sets up Python 3 so that non-privileged users can install Python
 modules with pip in `/usr/local/lib/python3.x`. Binary symlinks get created in
 `/usr/local/bin`. So far, it’s working ok without having to use virtualenv on my Mac.
 
-### "Fix" docker-machine
-
-Ansible isn't really meant for containers.  Sure, there are articles out there
-claiming that you can automate containers with Ansible but that whole process
-seems silly, considering how simple containers are.  Consider tools like
-[source2image](https://github.com/openshift/source-to-image) and using CM tools
-on containers makes even *less* sense.
-
-Lots of Ansible roles assume you're running them on a VM, so when things like
-systemd or d-bus aren't avialable, you'll run into trouble.  You'll need to "fix"
-your docker-machine so that the centos-systemd docker image can run:
-
-        docker run -t -i --rm --privileged -v /:/host solita/centos-systemd setup
-        docker rmi solita/centos-systemd
-
-Feel free to check out [this container](https://hub.docker.com/r/solita/centos-systemd/).
-The author deserves kudos, for sure.  If you don't have docker-machine installed,
-read the next section.
-
 ### Getting started
 
 Installing on a Mac with homebrew and pip:
 
         brew install python
-        brew cask install docker # optional?  May not be required.
-        brew install docker
-        brew link --overwrite docker
-        
-        brew install docker-machine
-        brew install docker-machine-driver-xhyve # optional
+        brew cask install docker
 
-        cat >> ~/.bash_profile <<EOF
-        brew_prefix=$(brew --prefix)
-        export PATH="${brew_prefix}/opt/python/libexec/bin:/usr/local/sbin:${PATH}"
-        dme() {
-          eval $(docker-machine env)
-        }
-        EOF
-        
-        source ~/.bash_profile # note the dme function, above
-
-        brew doctor # if anything's wrong, follow brew's instructions to fix it.
-        
         pip --version
         # pip 18.0 from /usr/local/lib/python3.7/site-packages/pip (python 3.7)
         
@@ -72,16 +36,12 @@ Installing on a Mac with homebrew and pip:
         # Molecule autocomplete
         eval "$(_MOLECULE_COMPLETE=source molecule)"
         EOF
-        Running docker-machine on a Mac:
-        
-        docker-machine create default --driver xhyve
-        dme # or eval $(docker-machine env default)
+
+Stop here an open the docker application through Finder.
         
         # test it out:
         docker run --name test -d centos /bin/bash -c 'echo it worked'
         docker logs test
-
-Remember to fix your running docker-machine VM.  See above.
 
 ### Running molecule
 
