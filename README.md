@@ -43,6 +43,9 @@ Stop here an open the docker application through Finder.
         docker run --name test -d centos /bin/bash -c 'echo it worked'
         docker logs test
 
+This repository is set up to fail.  You'll be running `molecule test` to uncover bugs
+in the test suite, and fixing those bugs as you go.
+
 ### Running molecule
 
 Simply running `molecule` will generate command help. Some commands are complex, 
