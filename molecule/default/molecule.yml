@@ -11,7 +11,8 @@ platforms:
   - name: instance
     # EXAMPLE_4: break 'molecule create' by changing 'latest' to 'best'
     # because you should always run the best Docker image
-    image: centos/systemd:best
+    # image: centos/systemd:best
+    image: centos/systemd:latest
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     security_opts:
@@ -41,7 +42,7 @@ scenario:
     - prepare
     - converge
     # EXAMPLE_6: idempotence is hard.  Look at molecule scenarios for CI.
-    - idempotence
+    # - idempotence
     - side_effect
     - verify
     - destroy

@@ -16,25 +16,25 @@ def test_hosts_file(host):
     f = host.file('/etc/hosts')
 
     # EXAMPLE_7 break TestInfra by testing that /etc/hosts does not esist
-    assert f.exists is not True
+    assert f.exists  # is not True
     assert f.user == 'root'
     assert f.group == 'root'
 
 
-# @pytest.mark.parametrize('name', ['which', 'iproute'])
-# def test_base_packages(host, name):
-#     p = host.package(name)
+@pytest.mark.parametrize('name', ['which', 'iproute'])
+def test_base_packages(host, name):
+    p = host.package(name)
+
+    assert p.is_installed
+
+
+# def test_which_package(host):
+#     p = host.package('which')
 #
 #     assert p.is_installed
-
-
-def test_which_package(host):
-    p = host.package('which')
-
-    assert p.is_installed
-
-
-def test_iproute_package(host):
-    p = host.package('iproute')
-
-    assert p.is_installed
+#
+#
+# def test_iproute_package(host):
+#     p = host.package('iproute')
+#
+#     assert p.is_installed

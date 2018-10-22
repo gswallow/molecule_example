@@ -4,4 +4,5 @@
 
 # EXAMPLE_2: break dependencies with 'v0.4.1'
 - name: "cchurch.uwsgi"
-  version: 'v0.4.1'
+  # version: 'v0.4.1'
+  version: '0.4.1'
