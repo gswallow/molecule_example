@@ -1,24 +1,24 @@
 ## Test-driven Ansible Role Development with Molecule and Docker
 
-Molecule is a testing framework that can fire up a VM or a Linux container 
-and test an Ansible role through scenarios (a sample playbook). It checks 
-the syntax of the scenario playbook (and thus, the associated role), converges 
-the VM or container, and then tests that Ansible did its job with TestInfra.
-
-Some components should be installed with Homebrew. The python bits should 
-be installed with Python pip, once Homebrew has it set up.
+[Molecule](https://molecule.readthedocs.io/) is a testing framework 
+that can fire up a VM or a Linux container and test an Ansible role through 
+scenarios (example playbooks). It checks the syntax of the scenario playbook 
+(and thus, the associated role), converges the VM or container, and then 
+tests that Ansible did its job with [TestInfra](https://testinfra.readthedocs.io/).
 
 ### Why docker?
 
 Spinning up a container takes a fraction of the time it takes to spin up a VM 
 using Vagrant.
 
-### Why homebrew?
+### Homebrew
 
-Homebrew is going to set up Python 3 so that, as a non-privileged user, 
-you can install Python modules with pip in `/usr/local/lib/python3.x`. Binary 
-symlinks get created in `/usr/local/bin`. So far, it’s working ok without 
-having to use virtualenv on my mac.
+On a Mac, some components should be installed with [Homebrew](https://brew.sh/).
+The python bits should be installed with Python pip, once Homebrew has it set up.
+
+Homebrew sets up Python 3 so that non-privileged users can install Python
+modules with pip in `/usr/local/lib/python3.x`. Binary symlinks get created in
+`/usr/local/bin`. So far, it’s working ok without having to use virtualenv on my Mac.
 
 ### "Fix" docker-machine
 
