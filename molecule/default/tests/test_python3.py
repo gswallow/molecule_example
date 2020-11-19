@@ -13,10 +13,10 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 # Yes, it's parametrize
 @pytest.mark.parametrize('name', [
     'python-setuptools',
-    'python36u',
-    'python36u-devel',
-    'python36u-pip',
-    'python36u-setuptools'
+    'python3',
+    'python3-devel',
+    'python3-pip',
+    'python3-setuptools'
     ])
 def test_package(host, name):
     p = host.package(name)

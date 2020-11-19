@@ -1,7 +1,7 @@
 ---
 - name: "python3 | Install packages"
   yum:
-    name: [ "python-setuptools", "python36u", "python36u-devel", "python36u-setuptools", "python36u-pip" ]
+    name: [ "python-setuptools", "python3", "python3-devel", "python3-setuptools", "python3-pip" ]
     state: present
 
 - name: "python3 | Install virtualenv"

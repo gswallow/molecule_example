@@ -11,7 +11,7 @@
     django_user: root
     uwsgi_os_packages:
       - uwsgi
-      - uwsgi-plugin-python36u
+      - uwsgi-plugin-python
     uwsgi_use_systemd: true
     uwsgi_vassals:
       - name: blog

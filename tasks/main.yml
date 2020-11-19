@@ -1,5 +1,5 @@
 ---
-# EXAMPLE_5: Break convergence by instealling a pakage that doesn't exist
+# EXAMPLE_5: Break convergence by installing a package that doesn't exist
 - name: "main | install it_just_works"
   yum:
     name: it_just_works
