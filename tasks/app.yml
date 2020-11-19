@@ -9,6 +9,7 @@
     state: directory
     name: "{{ item }}"
     recurse: true
+    mode: "0755"
   with_items:
     - /app
     - /venv
@@ -16,6 +17,7 @@
 - name: "app | Clone example app"
   git:
     repo: "https://github.com/reljicd/django-blog.git"
+    version: master
     dest: /app/django-blog
     update: false
     force: true
@@ -45,4 +47,4 @@
     mode: 0755
     owner: root
     group: root
-  when: _stat_run_uwsgi.stat.exists == False
+  when: not _stat_run_uwsgi.stat.exists

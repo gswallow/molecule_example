@@ -5,8 +5,7 @@ dependency:
     role-file: requirements.yml
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: set -e ; yamllint . ; ansible-lint ; flake8
 platforms:
   - name: instance
     # EXAMPLE_4: break 'molecule create' by changing 'latest' to 'best'
@@ -28,14 +27,34 @@ platforms:
     command: /usr/sbin/init
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
 scenario:
-  name: default
-  test_sequence:
-    - lint
-    - destroy
+  create_sequence:
     - dependency
+    - create
+    - prepare
+  check_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - create
+    - prepare
+    - converge
+    - check
+    - destroy
+  converge_sequence:
+    - dependency
+    - create
+    - prepare
+    - converge
+  destroy_sequence:
+    - dependency
+    - cleanup
+    - destroy
+  test_sequence:
+    - dependency
+    - lint
+    - cleanup
+    - destroy
     - syntax
     - create
     - prepare
@@ -44,8 +63,7 @@ scenario:
     - idempotence
     - side_effect
     - verify
+    - cleanup
     - destroy
 verifier:
   name: testinfra
-  lint:
-    name: flake8

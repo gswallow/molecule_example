@@ -30,7 +30,7 @@
         max-requests: 1000
 
   roles:
-    - role: molecule-example
+    - role: molecule_example
     - role: cchurch.django
     - role: cchurch.uwsgi
 

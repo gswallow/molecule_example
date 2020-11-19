@@ -26,18 +26,13 @@ Installing on a Mac with homebrew and pip:
 
         brew install python
         brew cask install docker
+        pip3 install virtualenv
 
-        pip --version
-        # pip 18.0 from /usr/local/lib/python3.7/site-packages/pip (python 3.7)
-        
-        pip install molecule docker
-        
-        cat >> ~/.bash_profile <<EOF
-        # Molecule autocomplete
-        eval "$(_MOLECULE_COMPLETE=source molecule)"
-        EOF
+        virtualenv .venv
+        source .venv/bin/activate
+        pip3 install -r requirements.txt
 
-Stop here an open the docker application through Finder.
+Stop here and open the docker application through Finder.
         
         # test it out:
         docker run --name test -d centos /bin/bash -c 'echo it worked'
@@ -52,7 +47,7 @@ Simply running `molecule` will generate command help. Some commands are complex,
 while some commands are simple. `molecule matrix` explains what a complex command does:
 
         $ molecule matrix test
-        --> Validating schema /Users/gswallow/src/greg/molecule-example/molecule/default/molecule.yml.
+        --> Validating schema /Users/gswallow/src/greg/molecule_example/molecule/default/molecule.yml.
         Validation completed successfully.
         --> Test matrix  
         └── default
@@ -150,7 +145,7 @@ Our test fails because nginx is not installed. Let’s install nginx. Edit the
 
 It should pass. Run `molecule converge`.
         
-         TASK [molecule-example : Install nginx package] ********************************
+         TASK [molecule_example : Install nginx package] ********************************
             fatal: [instance]: FAILED! => {"changed": false, "msg": "No package matching 'nginx' found available, installed or updated", "rc": 126, "results": ["No package matching 'nginx' found available, installed or updated"]}
 
 Whoops. There’s no package named ‘nginx.' Let’s fix that. Edit the `molecule/default/tests/test_default.py`
@@ -230,7 +225,7 @@ Finally, we’ll include the role in the play:
             django_user: root
         
           roles:
-            - role: molecule-example
+            - role: molecule_example
             - role: cchurch.django
 
 #### Molecule test flags and test_sequence
