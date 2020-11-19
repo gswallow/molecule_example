@@ -51,8 +51,8 @@ scenario:
     - cleanup
     - destroy
   test_sequence:
-    - dependency
     - lint
+    - dependency
     - cleanup
     - destroy
     - syntax
