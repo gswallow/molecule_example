@@ -33,7 +33,7 @@ ptyprocess==0.6.0
 pycodestyle==2.6.0
 pycparser==2.20
 pyflakes==2.2.0
-Pygments==2.7.2
+Pygments==2.7.4
 PyNaCl==1.4.0
 pyparsing==2.4.7
 python-dateutil==2.8.1
